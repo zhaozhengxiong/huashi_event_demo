@@ -47,7 +47,7 @@ const resolveStageFromSearch = (): Stage => {
 };
 
 const VIEW_STAGE_RULES: Record<ActivityView, Stage[]> = {
-  home: ["registration", "evaluation"],
+  home: ["registration"],
   register: ["registration"],
   vote: ["evaluation"],
   myEntries: ["evaluation", "announcement"],
@@ -183,6 +183,7 @@ function App() {
           <PkListTable
             matches={MATCHES}
             worksMap={WORKS_MAP}
+            meta={ACTIVITY_META}
             onSelect={(pk) => {
               setActivePk(pk);
               setActiveView("vote");

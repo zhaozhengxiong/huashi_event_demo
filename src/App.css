@@ -573,6 +573,59 @@
   gap: 1.4rem;
 }
 
+.pk-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  background: rgba(14, 21, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+}
+
+.pk-meta-item {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.pk-meta-label {
+  font-size: 0.85rem;
+  color: rgba(206, 216, 255, 0.7);
+}
+
+.pk-meta-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.pk-meta-progress {
+  gap: 0.6rem;
+}
+
+.pk-meta-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.pk-progress-track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.pk-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(89, 132, 255, 0.9), rgba(122, 89, 255, 0.9));
+}
+
+.pk-progress-percent {
+  font-size: 0.85rem;
+  color: rgba(206, 216, 255, 0.8);
+}
+
 .entry-list {
   display: grid;
   gap: 1.2rem;

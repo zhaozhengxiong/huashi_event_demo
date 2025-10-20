@@ -1,18 +1,52 @@
-﻿import type { Match, OcWork } from '../types'
+import type { ActivityMeta, Match, OcWork } from '../types'
 
 interface PkListTableProps {
   matches: Match[]
   worksMap: Record<string, OcWork>
   onSelect: (pkNumber: string) => void
+  meta: ActivityMeta
 }
 
-function PkListTable({ matches, worksMap, onSelect }: PkListTableProps) {
+function PkListTable({ matches, worksMap, onSelect, meta }: PkListTableProps) {
+  const progressRatio = meta.totalGroups > 0 ? meta.completedGroups / meta.totalGroups : 0
+  const clampedRatio = Math.max(0, Math.min(progressRatio, 1))
+  const progressPercent = Math.round(clampedRatio * 100)
+
   return (
     <section className='pk-list'>
       <header>
         <h2>当前轮次 PK 列表</h2>
         <p>快速浏览所有对阵，选择感兴趣的 PK 进入投票。</p>
       </header>
+      <div className='pk-meta'>
+        <div className='pk-meta-item'>
+          <span className='pk-meta-label'>当前轮次</span>
+          <strong className='pk-meta-value'>{meta.currentRound}</strong>
+        </div>
+        <div className='pk-meta-item pk-meta-progress'>
+          <div className='pk-meta-progress-header'>
+            <span className='pk-meta-label'>进度</span>
+            <span className='pk-meta-value'>
+              {meta.completedGroups}/{meta.totalGroups}
+            </span>
+          </div>
+          <div
+            className='pk-progress-track'
+            role='progressbar'
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progressPercent}
+            aria-valuetext={`${meta.completedGroups}/${meta.totalGroups}`}
+          >
+            <div className='pk-progress-fill' style={{ width: `${progressPercent}%` }} />
+          </div>
+          <span className='pk-progress-percent'>{progressPercent}%</span>
+        </div>
+        <div className='pk-meta-item'>
+          <span className='pk-meta-label'>剩余时间</span>
+          <strong className='pk-meta-value'>{meta.remainingTimeLabel}</strong>
+        </div>
+      </div>
       <div className='pk-table-wrapper'>
         <table className='pk-table'>
           <thead>
@@ -79,5 +113,3 @@ function PkListTable({ matches, worksMap, onSelect }: PkListTableProps) {
 }
 
 export default PkListTable
-
-
