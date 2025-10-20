@@ -1232,6 +1232,20 @@
   gap: 1rem;
 }
 
+.lottery-action {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.lottery-action button {
+  min-width: 140px;
+}
+
+.lottery-feedback {
+  font-size: 0.85rem;
+  color: #f6d375;
+}
+
 .unlock-badge {
   padding: 0.3rem 0.8rem;
   border-radius: 999px;
@@ -1280,6 +1294,35 @@
   background: rgba(5, 9, 20, 0.6);
   border-radius: 12px;
   padding: 0.7rem 0.9rem;
+}
+
+.lottery-modal {
+  text-align: center;
+  gap: 1.2rem;
+}
+
+.lottery-modal-body {
+  display: grid;
+  gap: 0.8rem;
+  justify-items: center;
+}
+
+.lottery-modal-body img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  border-radius: 16px;
+}
+
+.lottery-result-title {
+  font-size: 1.1rem;
+  color: #f8f5ff;
+}
+
+.lottery-result-tip {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
 }
 
 .modal-mask {
