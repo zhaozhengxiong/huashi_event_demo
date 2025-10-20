@@ -22,9 +22,10 @@ function LotteryPanel({ config }: LotteryPanelProps) {
       </div>
       <div className='lottery-grid'>
         {config.rewards.map((reward) => (
-          <div key={reward} className='lottery-item'>
-            <strong>{reward}</strong>
-            <span>概率：均等</span>
+          <div key={reward.id} className='lottery-item'>
+            <img src={reward.imageUrl} alt={reward.name} />
+            <strong>{reward.name}</strong>
+            <span>概率：{reward.probability}%</span>
           </div>
         ))}
       </div>
