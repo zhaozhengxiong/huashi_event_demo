@@ -96,6 +96,10 @@ function App() {
   const handleStageChange = (nextStage: Stage) => {
     setStage(nextStage)
     setActiveView((current) => {
+      if (nextStage === 'evaluation') {
+        return 'pkList'
+      }
+
       const isValid = VIEW_STAGE_RULES[current].includes(nextStage)
       return isValid ? current : DEFAULT_VIEW_BY_STAGE[nextStage]
     })
