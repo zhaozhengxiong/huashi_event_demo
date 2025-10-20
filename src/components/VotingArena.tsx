@@ -52,6 +52,18 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
     [matches, voteHistory]
   )
 
+  const votesPerDraw = 10
+
+  const votesCast = useMemo(
+    () => Object.values(voteHistory).filter((result) => result !== 'skip').length,
+    [voteHistory]
+  )
+
+  const drawsEarned = Math.floor(votesCast / votesPerDraw)
+  const lotteryProgressLabel = drawsEarned
+    ? `完成投票 ${Math.min(votesCast, votesPerDraw)}/${votesPerDraw}，获得抽奖机会 +${drawsEarned}`
+    : `完成投票 ${votesCast}/${votesPerDraw}，还差${votesPerDraw - votesCast}票可获得1次抽奖机会`
+
   const handleVote = (result: VoteResult) => {
     if (!currentMatch || currentMatch.status === 'closed') {
       return
@@ -154,11 +166,7 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
           投右
         </button>
       </div>
-      {completedCount === matches.length && (
-        <div className='arena-footer'>
-          🎉 恭喜完成当轮所有对阵，抽奖入口已点亮。
-        </div>
-      )}
+      <div className='arena-footer'>{lotteryProgressLabel}</div>
     </section>
   )
 }
