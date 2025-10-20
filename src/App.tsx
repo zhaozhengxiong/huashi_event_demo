@@ -1,9 +1,10 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import ActivityHome from "./components/ActivityHome";
 import LeaderboardWall from "./components/LeaderboardWall";
 import LotteryPanel from "./components/LotteryPanel";
 import MyEntriesBoard from "./components/MyEntriesBoard";
 import PkListTable from "./components/PkListTable";
+import PkNumberSearch from "./components/PkNumberSearch";
 import RegistrationForm from "./components/RegistrationForm";
 import ShippingModal from "./components/ShippingModal";
 import TopNav from "./components/TopNav";
@@ -92,9 +93,14 @@ function App() {
     const myWorkIds = new Set(MY_ENTRIES.map((entry) => entry.workId));
     return LEADERBOARD.find((entry) => myWorkIds.has(entry.workId));
   }, []);
-  const winnerWork = useMemo(
-    () => (myWinningEntry ? WORKS_MAP[myWinningEntry.workId] : undefined),
-    [myWinningEntry]
+  const winnerWork = useMemo(() => (myWinningEntry ? WORKS_MAP[myWinningEntry.workId] : undefined), [myWinningEntry]);
+
+  const handlePkNavigate = useCallback(
+    (pkNumber: string) => {
+      setActivePk(pkNumber);
+      setActiveView("vote");
+    },
+    [setActivePk, setActiveView]
   );
 
   const allowedViews = useMemo(
@@ -205,6 +211,9 @@ function App() {
         </div>
       </header>
       <TopNav items={navItems} activeView={activeView} onSelect={(view) => setActiveView(view)} />
+      {stage === "evaluation" && activeView !== "vote" && (
+        <PkNumberSearch matches={MATCHES} onNavigate={handlePkNavigate} />
+      )}
       <main className="app-main">{renderView()}</main>
       <footer className="app-footer">
         <small>本页面所有数据均为演示用途的模拟数据。</small>
