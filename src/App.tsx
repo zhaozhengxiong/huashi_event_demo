@@ -10,40 +10,51 @@ import ShippingModal from "./components/ShippingModal";
 import TopNav from "./components/TopNav";
 import VotingArena from "./components/VotingArena";
 import {
-  ACTIVITY_META,
+  ACTIVITY_META_BY_STAGE,
   LEADERBOARD,
   LOTTERY_CONFIG,
-  MATCHES,
+  MATCHES_BY_STAGE,
   MY_ENTRIES,
   OC_WORKS,
   REGISTRATION_CONFIG,
 } from "./data/mockData";
-import type { ActivityView, ShippingInfo, Stage, UserProfile } from "./types";
+import type { ActivityView, ShippingInfo, Stage, StageVariant, UserProfile } from "./types";
 import "./App.css";
 
-const DEFAULT_STAGE: Stage = "evaluation";
-const STAGE_ORDER: Stage[] = ["registration", "evaluation", "announcement"];
+interface StageState {
+  stage: Stage;
+  variant: StageVariant;
+  index: number;
+}
+
+const STAGE_SEQUENCE: StageState[] = [
+  { stage: "registration", variant: "registration", index: 0 },
+  { stage: "evaluation", variant: "evaluation-32", index: 1 },
+  { stage: "evaluation", variant: "evaluation-8", index: 2 },
+  { stage: "announcement", variant: "announcement", index: 3 },
+];
+
+const DEFAULT_STAGE_STATE = STAGE_SEQUENCE[2];
 const DEFAULT_VIEW_BY_STAGE: Record<Stage, ActivityView> = {
   registration: "home",
   evaluation: "pkList",
   announcement: "leaderboard",
 };
 
-const resolveStageFromSearch = (): Stage => {
+const resolveStageFromSearch = (): StageState => {
   if (typeof window === "undefined") {
-    return DEFAULT_STAGE;
+    return DEFAULT_STAGE_STATE;
   }
   const params = new URLSearchParams(window.location.search);
   const stageParam = params.get("stage");
   if (stageParam === null) {
-    return DEFAULT_STAGE;
+    return DEFAULT_STAGE_STATE;
   }
   const stageIndex = Number(stageParam);
   if (!Number.isInteger(stageIndex)) {
-    return DEFAULT_STAGE;
+    return DEFAULT_STAGE_STATE;
   }
-  const stageFromUrl = STAGE_ORDER[stageIndex];
-  return stageFromUrl ?? DEFAULT_STAGE;
+  return STAGE_SEQUENCE[stageIndex] ?? DEFAULT_STAGE_STATE;
 };
 
 const VIEW_STAGE_RULES: Record<ActivityView, Stage[]> = {
@@ -82,10 +93,13 @@ const WORKS_MAP = OC_WORKS.reduce<Record<string, (typeof OC_WORKS)[number]>>((ac
 }, {});
 
 function App() {
-  const initialStage = useMemo(() => resolveStageFromSearch(), []);
-  const [stage, setStage] = useState<Stage>(initialStage);
-  const [activeView, setActiveView] = useState<ActivityView>(DEFAULT_VIEW_BY_STAGE[initialStage]);
-  const [activePk, setActivePk] = useState<string | undefined>(MATCHES[0]?.pkNumber);
+  const initialStageState = useMemo(() => resolveStageFromSearch(), []);
+  const initialMatches = MATCHES_BY_STAGE[initialStageState.variant] ?? [];
+  const [stageState, setStageState] = useState<StageState>(initialStageState);
+  const stage = stageState.stage;
+  const stageVariant = stageState.variant;
+  const [activeView, setActiveView] = useState<ActivityView>(DEFAULT_VIEW_BY_STAGE[initialStageState.stage]);
+  const [activePk, setActivePk] = useState<string | undefined>(initialMatches[0]?.pkNumber);
   const [shippingVisible, setShippingVisible] = useState(false);
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null);
   const [registrationVisible, setRegistrationVisible] = useState(false);
@@ -95,6 +109,19 @@ function App() {
     return LEADERBOARD.find((entry) => myWorkIds.has(entry.workId));
   }, []);
   const winnerWork = useMemo(() => (myWinningEntry ? WORKS_MAP[myWinningEntry.workId] : undefined), [myWinningEntry]);
+  const matches = useMemo(() => MATCHES_BY_STAGE[stageVariant] ?? [], [stageVariant]);
+  const activityMeta = useMemo(
+    () => ACTIVITY_META_BY_STAGE[stageVariant] ?? ACTIVITY_META_BY_STAGE[DEFAULT_STAGE_STATE.variant],
+    [stageVariant]
+  );
+
+  useEffect(() => {
+    if (!matches.length) {
+      setActivePk(undefined);
+      return;
+    }
+    setActivePk((current) => (current && matches.some((match) => match.pkNumber === current) ? current : matches[0].pkNumber));
+  }, [matches]);
 
   const handlePkNavigate = useCallback(
     (pkNumber: string) => {
@@ -142,7 +169,9 @@ function App() {
   useEffect(() => {
     const syncStageFromUrl = () => {
       const nextStage = resolveStageFromSearch();
-      setStage((currentStage) => (currentStage === nextStage ? currentStage : nextStage));
+      setStageState((currentStage) =>
+        currentStage.index === nextStage.index ? currentStage : nextStage
+      );
     };
 
     window.addEventListener("popstate", syncStageFromUrl);
@@ -158,7 +187,7 @@ function App() {
           <ActivityHome
             stage={stage}
             registration={REGISTRATION_CONFIG}
-            meta={ACTIVITY_META}
+            meta={activityMeta}
             leaderboard={LEADERBOARD}
             worksMap={WORKS_MAP}
             onNavigate={(view) => setActiveView(view)}
@@ -170,9 +199,9 @@ function App() {
       case "vote":
         return (
           <VotingArena
-            matches={MATCHES}
+            matches={matches}
             worksMap={WORKS_MAP}
-            meta={ACTIVITY_META}
+            meta={activityMeta}
             activePk={activePk}
             onActivePkChange={(pk) => setActivePk(pk)}
           />
@@ -182,9 +211,9 @@ function App() {
       case "pkList":
         return (
           <PkListTable
-            matches={MATCHES}
+            matches={matches}
             worksMap={WORKS_MAP}
-            meta={ACTIVITY_META}
+            meta={activityMeta}
             onSelect={(pk) => {
               setActivePk(pk);
               setActiveView("vote");
@@ -213,8 +242,8 @@ function App() {
         </div>
       </header>
       <TopNav items={navItems} activeView={activeView} onSelect={(view) => setActiveView(view)} />
-      {stage === "evaluation" && activeView !== "vote" && (
-        <PkNumberSearch matches={MATCHES} onNavigate={handlePkNavigate} />
+      {stage === "evaluation" && activeView !== "vote" && matches.length > 0 && (
+        <PkNumberSearch matches={matches} onNavigate={handlePkNavigate} />
       )}
       <main className="app-main">{renderView()}</main>
       <footer className="app-footer">

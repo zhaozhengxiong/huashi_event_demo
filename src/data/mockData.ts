@@ -1,4 +1,13 @@
-﻿import type { ActivityMeta, LeaderboardEntry, LotteryConfig, Match, MyEntry, OcWork, RegistrationConfig } from '../types'
+import type {
+  ActivityMeta,
+  LeaderboardEntry,
+  LotteryConfig,
+  Match,
+  MyEntry,
+  OcWork,
+  RegistrationConfig,
+  StageVariant
+} from '../types'
 
 export const MOCK_STAGE: 'registration' | 'evaluation' | 'announcement' = 'evaluation'
 
@@ -157,32 +166,139 @@ export const REGISTRATION_CONFIG: RegistrationConfig = {
   ]
 }
 
-export const MATCHES: Match[] = [
+const MATCHES_EVALUATION_32: Match[] = [
   {
-    pkNumber: 'A102',
-    round: '64 进 32',
-    deadline: '2025-10-24T18:00:00+08:00',
-    left: { workId: 'work-neo-aurora', score: 64, votes: 320 },
-    right: { workId: 'work-sandbard', score: 58, votes: 298 },
-    status: 'open'
-  },
-  {
-    pkNumber: 'A204',
-    round: '64 进 32',
-    deadline: '2025-10-24T18:00:00+08:00',
-    left: { workId: 'work-clocktailor', score: 72, votes: 402 },
-    right: { workId: 'work-mistrider', score: 70, votes: 401 },
-    status: 'open'
-  },
-  {
-    pkNumber: 'B108',
+    pkNumber: 'R16-01',
     round: '32 进 16',
-    deadline: '2025-10-26T20:00:00+08:00',
-    left: { workId: 'work-neo-aurora', score: 84, votes: 512 },
-    right: { workId: 'work-clocktailor', score: 79, votes: 478 },
+    deadline: '2025-10-28T18:00:00+08:00',
+    left: { workId: 'work-neo-aurora', score: 89, votes: 412 },
+    right: { workId: 'work-riftchef', score: 84, votes: 376 },
+    status: 'closed'
+  },
+  {
+    pkNumber: 'R16-02',
+    round: '32 进 16',
+    deadline: '2025-10-28T19:00:00+08:00',
+    left: { workId: 'work-sandbard', score: 85, votes: 398 },
+    right: { workId: 'work-windcarver', score: 80, votes: 344 },
+    status: 'closed'
+  },
+  {
+    pkNumber: 'R16-03',
+    round: '32 进 16',
+    deadline: '2025-10-29T18:00:00+08:00',
+    left: { workId: 'work-clocktailor', score: 90, votes: 436 },
+    right: { workId: 'work-inkguard', score: 83, votes: 362 },
+    status: 'closed'
+  },
+  {
+    pkNumber: 'R16-04',
+    round: '32 进 16',
+    deadline: '2025-10-29T19:30:00+08:00',
+    left: { workId: 'work-mistrider', score: 88, votes: 421 },
+    right: { workId: 'work-starseer', score: 87, votes: 415 },
+    status: 'closed'
+  },
+  {
+    pkNumber: 'R16-05',
+    round: '32 进 16',
+    deadline: '2025-10-30T18:00:00+08:00',
+    left: { workId: 'work-neo-aurora', score: 91, votes: 452 },
+    right: { workId: 'work-windcarver', score: 82, votes: 331 },
+    status: 'open'
+  },
+  {
+    pkNumber: 'R16-06',
+    round: '32 进 16',
+    deadline: '2025-10-30T19:00:00+08:00',
+    left: { workId: 'work-clocktailor', score: 93, votes: 468 },
+    right: { workId: 'work-riftchef', score: 85, votes: 352 },
+    status: 'open'
+  },
+  {
+    pkNumber: 'R16-07',
+    round: '32 进 16',
+    deadline: '2025-10-31T18:00:00+08:00',
+    left: { workId: 'work-starseer', score: 89, votes: 404 },
+    right: { workId: 'work-inkguard', score: 86, votes: 378 },
+    status: 'open'
+  },
+  {
+    pkNumber: 'R16-08',
+    round: '32 进 16',
+    deadline: '2025-10-31T20:00:00+08:00',
+    left: { workId: 'work-mistrider', score: 90, votes: 446 },
+    right: { workId: 'work-sandbard', score: 84, votes: 362 },
+    status: 'open'
+  }
+]
+
+const MATCHES_EVALUATION_8: Match[] = [
+  {
+    pkNumber: 'QF01',
+    round: '8 进 4',
+    deadline: '2025-11-02T18:00:00+08:00',
+    left: { workId: 'work-neo-aurora', score: 92, votes: 618 },
+    right: { workId: 'work-inkguard', score: 86, votes: 564 },
+    status: 'open'
+  },
+  {
+    pkNumber: 'QF02',
+    round: '8 进 4',
+    deadline: '2025-11-02T19:00:00+08:00',
+    left: { workId: 'work-sandbard', score: 88, votes: 532 },
+    right: { workId: 'work-starseer', score: 90, votes: 548 },
+    status: 'open'
+  },
+  {
+    pkNumber: 'QF03',
+    round: '8 进 4',
+    deadline: '2025-11-03T18:00:00+08:00',
+    left: { workId: 'work-clocktailor', score: 94, votes: 601 },
+    right: { workId: 'work-riftchef', score: 87, votes: 522 },
+    status: 'open'
+  },
+  {
+    pkNumber: 'QF04',
+    round: '8 进 4',
+    deadline: '2025-11-03T19:00:00+08:00',
+    left: { workId: 'work-mistrider', score: 90, votes: 566 },
+    right: { workId: 'work-windcarver', score: 84, votes: 498 },
+    status: 'open'
+  },
+  {
+    pkNumber: 'SF01',
+    round: '4 进 2',
+    deadline: '2025-11-05T20:00:00+08:00',
+    left: { workId: 'work-neo-aurora', score: 96, votes: 652 },
+    right: { workId: 'work-starseer', score: 93, votes: 618 },
+    status: 'closed'
+  },
+  {
+    pkNumber: 'SF02',
+    round: '4 进 2',
+    deadline: '2025-11-05T21:00:00+08:00',
+    left: { workId: 'work-clocktailor', score: 95, votes: 640 },
+    right: { workId: 'work-mistrider', score: 91, votes: 604 },
+    status: 'closed'
+  },
+  {
+    pkNumber: 'GF01',
+    round: '冠军战',
+    deadline: '2025-11-07T20:30:00+08:00',
+    left: { workId: 'work-neo-aurora', score: 98, votes: 712 },
+    right: { workId: 'work-clocktailor', score: 97, votes: 705 },
     status: 'closed'
   }
 ]
+
+export const MATCHES_BY_STAGE: Record<StageVariant, Match[]> = {
+  registration: [],
+  'evaluation-32': MATCHES_EVALUATION_32,
+  'evaluation-8': MATCHES_EVALUATION_8,
+  announcement: MATCHES_EVALUATION_8
+}
+
 
 export const MY_ENTRIES: MyEntry[] = [
   {
@@ -267,11 +383,38 @@ export const LOTTERY_CONFIG: LotteryConfig = {
   ]
 }
 
-export const ACTIVITY_META: ActivityMeta = {
-  currentRound: '64 进 32',
-  totalGroups: 32,
-  completedGroups: 18,
-  remainingTimeLabel: '剩余 02:18:45'
+const META_REGISTRATION: ActivityMeta = {
+  currentRound: '报名进行中',
+  totalGroups: 0,
+  completedGroups: 0,
+  remainingTimeLabel: '剩余 05 天 12:00:00'
 }
 
+const META_EVALUATION_32: ActivityMeta = {
+  currentRound: '32 进 16',
+  totalGroups: 16,
+  completedGroups: 6,
+  remainingTimeLabel: '剩余 08:12:45'
+}
+
+const META_EVALUATION_8: ActivityMeta = {
+  currentRound: '8 进 4',
+  totalGroups: 4,
+  completedGroups: 2,
+  remainingTimeLabel: '剩余 01:12:32'
+}
+
+const META_ANNOUNCEMENT: ActivityMeta = {
+  currentRound: '冠军战',
+  totalGroups: 1,
+  completedGroups: 1,
+  remainingTimeLabel: '已结束'
+}
+
+export const ACTIVITY_META_BY_STAGE: Record<StageVariant, ActivityMeta> = {
+  registration: META_REGISTRATION,
+  'evaluation-32': META_EVALUATION_32,
+  'evaluation-8': META_EVALUATION_8,
+  announcement: META_ANNOUNCEMENT
+}
 
