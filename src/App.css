@@ -835,6 +835,21 @@
   font-size: 0.9rem;
 }
 
+.registration-modal {
+  width: min(960px, 95vw);
+  max-height: 90vh;
+  grid-template-rows: auto 1fr;
+}
+
+.registration-modal .modal-body {
+  overflow-y: auto;
+  padding-right: 0.4rem;
+}
+
+.registration-modal .modal-body > .registration {
+  margin: 0;
+}
+
 .shipping-review {
   position: fixed;
   right: 2rem;
