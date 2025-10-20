@@ -48,7 +48,7 @@ const resolveStageFromSearch = (): Stage => {
 const VIEW_STAGE_RULES: Record<ActivityView, Stage[]> = {
   home: ["registration", "evaluation"],
   register: ["registration"],
-  vote: ["evaluation", "announcement"],
+  vote: ["evaluation"],
   myEntries: ["evaluation", "announcement"],
   pkList: ["evaluation"],
   leaderboard: ["announcement"],
