@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ActivityHome from './components/ActivityHome'
 import LeaderboardWall from './components/LeaderboardWall'
 import LotteryPanel from './components/LotteryPanel'
@@ -70,19 +70,31 @@ function App() {
   const [activePk, setActivePk] = useState<string | undefined>(MATCHES[0]?.pkNumber)
   const [shippingVisible, setShippingVisible] = useState(false)
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null)
+  const previousStageRef = useRef<Stage>(stage)
 
   useEffect(() => {
     const allowedViews = NAV_ORDER.filter((view) => VIEW_STAGE_RULES[view].includes(stage))
-    if (!allowedViews.includes(activeView)) {
+    const stageChanged = previousStageRef.current !== stage
+
+    if (stage === 'evaluation' && stageChanged) {
+      setActiveView('pkList')
+    } else if (!allowedViews.includes(activeView)) {
       setActiveView(DEFAULT_VIEW_BY_STAGE[stage])
     }
+
+    previousStageRef.current = stage
+  }, [stage, activeView])
+
+  useEffect(() => {
     if (stage === 'announcement' && userProfile.isWinner && !shippingInfo) {
       setShippingVisible(true)
+      return
     }
+
     if (stage !== 'announcement') {
       setShippingVisible(false)
     }
-  }, [stage, activeView, shippingInfo])
+  }, [stage, shippingInfo])
 
   const navItems = useMemo(
     () =>
