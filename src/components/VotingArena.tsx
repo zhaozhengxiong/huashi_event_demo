@@ -3,7 +3,13 @@ import type { ActivityMeta, Match, OcWork } from '../types'
 import WorkGallery from './WorkGallery'
 import PkNumberSearch from './PkNumberSearch'
 
-type VoteResult = 'left' | 'right' | 'skip'
+type VoteTarget = 'left' | 'right'
+
+interface MatchVotes {
+  left: number
+  right: number
+  lastPick?: VoteTarget
+}
 
 interface VotingArenaProps {
   matches: Match[]
@@ -15,7 +21,7 @@ interface VotingArenaProps {
 
 function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: VotingArenaProps) {
   const [internalPk, setInternalPk] = useState(matches[0]?.pkNumber ?? '')
-  const [voteHistory, setVoteHistory] = useState<Record<string, VoteResult>>({})
+  const [matchVotes, setMatchVotes] = useState<Record<string, MatchVotes>>({})
   const currentPk = activePk ?? internalPk
 
   const setPk = useCallback(
@@ -47,33 +53,47 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
 
   const completedCount = useMemo(
     () =>
-      matches.filter((match) => match.status === 'closed' || voteHistory[match.pkNumber])
-        .length,
-    [matches, voteHistory]
+      matches.filter((match) => {
+        if (match.status === 'closed') {
+          return true
+        }
+        const record = matchVotes[match.pkNumber]
+        if (!record) {
+          return false
+        }
+        return record.left + record.right > 0
+      }).length,
+    [matches, matchVotes]
   )
 
   const votesPerDraw = 10
 
   const votesCast = useMemo(
-    () => Object.values(voteHistory).filter((result) => result !== 'skip').length,
-    [voteHistory]
+    () =>
+      Object.values(matchVotes).reduce((total, record) => total + record.left + record.right, 0),
+    [matchVotes]
   )
 
   const drawsEarned = Math.floor(votesCast / votesPerDraw)
+  const votesTowardsNext = votesCast % votesPerDraw
+  const completedSegment = drawsEarned && votesTowardsNext === 0 ? votesPerDraw : votesTowardsNext
   const lotteryProgressLabel = drawsEarned
-    ? `完成投票 ${Math.min(votesCast, votesPerDraw)}/${votesPerDraw}，获得抽奖机会 +${drawsEarned}`
+    ? `完成投票 ${completedSegment}/${votesPerDraw}，获得抽奖机会 +${drawsEarned}`
     : `完成投票 ${votesCast}/${votesPerDraw}，还差${votesPerDraw - votesCast}票可获得1次抽奖机会`
 
-  const handleVote = (result: VoteResult) => {
+  const handleVote = (target: VoteTarget) => {
     if (!currentMatch || currentMatch.status === 'closed') {
       return
     }
-    setVoteHistory((prev) => ({ ...prev, [currentMatch.pkNumber]: result }))
-    const currentIndex = matches.findIndex((match) => match.pkNumber === currentMatch.pkNumber)
-    const remaining = matches.slice(currentIndex + 1).find((match) => match.status === 'open')
-    if (remaining) {
-      setPk(remaining.pkNumber)
-    }
+    setMatchVotes((prev) => {
+      const existing = prev[currentMatch.pkNumber] ?? { left: 0, right: 0 }
+      const updated: MatchVotes = {
+        left: existing.left + (target === 'left' ? 1 : 0),
+        right: existing.right + (target === 'right' ? 1 : 0),
+        lastPick: target
+      }
+      return { ...prev, [currentMatch.pkNumber]: updated }
+    })
   }
 
   const handlePkSearch = useCallback(
@@ -82,6 +102,17 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
     },
     [setPk]
   )
+
+  const handleShuffleMatch = useCallback(() => {
+    const available = matches.filter(
+      (match) => match.status === 'open' && match.pkNumber !== currentPk
+    )
+    if (!available.length) {
+      return
+    }
+    const randomIndex = Math.floor(Math.random() * available.length)
+    setPk(available[randomIndex].pkNumber)
+  }, [matches, currentPk, setPk])
 
   if (!currentMatch) {
     return <div className='empty-state'>暂无对阵，请稍后再来。</div>
@@ -93,7 +124,15 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
     hour12: false
   })
 
-  const currentVote = voteHistory[currentMatch.pkNumber]
+  const currentMatchVotes = matchVotes[currentMatch.pkNumber]
+  const totalVotesForCurrent = (currentMatchVotes?.left ?? 0) + (currentMatchVotes?.right ?? 0)
+  const paidVotesForCurrent = totalVotesForCurrent > 1 ? totalVotesForCurrent - 1 : 0
+  const voteRuleLabel = totalVotesForCurrent
+    ? paidVotesForCurrent
+      ? `本组已投 ${totalVotesForCurrent} 票，其中 ${paidVotesForCurrent} 票需消耗积分。`
+      : '已使用免费票，继续投票将消耗积分。'
+    : '本组第一票免费，继续投票将消耗积分。'
+  const lastPick = currentMatchVotes?.lastPick
 
   return (
     <section className='voting-arena'>
@@ -123,7 +162,7 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
       </header>
       <PkNumberSearch matches={matches} onNavigate={handlePkSearch} />
       <div className='arena-body'>
-        <article className={`arena-card${currentVote === 'left' ? ' is-picked' : ''}`}>
+        <article className={`arena-card${lastPick === 'left' ? ' is-picked' : ''}`}>
           <header>
             <h3>{leftWork?.title ?? '待补充'}</h3>
             <span className='creator'>作者：{leftWork?.creator ?? '未知'}</span>
@@ -139,7 +178,7 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
           <button type='button' className='ghost-button'>查看作品详情</button>
         </article>
         <div className='arena-divider'>VS</div>
-        <article className={`arena-card${currentVote === 'right' ? ' is-picked' : ''}`}>
+        <article className={`arena-card${lastPick === 'right' ? ' is-picked' : ''}`}>
           <header>
             <h3>{rightWork?.title ?? '待补充'}</h3>
             <span className='creator'>作者：{rightWork?.creator ?? '未知'}</span>
@@ -159,14 +198,17 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
         <button type='button' onClick={() => handleVote('left')}>
           投左
         </button>
-        <button type='button' className='ghost-button' onClick={() => handleVote('skip')}>
-          弃权
+        <button type='button' onClick={handleShuffleMatch} className='ghost-button'>
+          换一组
         </button>
         <button type='button' onClick={() => handleVote('right')}>
           投右
         </button>
       </div>
-      <div className='arena-footer'>{lotteryProgressLabel}</div>
+      <div className='arena-footer'>
+        <span>{voteRuleLabel}</span>
+        <span>{lotteryProgressLabel}</span>
+      </div>
     </section>
   )
 }

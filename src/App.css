@@ -556,6 +556,10 @@
   border-radius: 14px;
   padding: 0.9rem 1.1rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: center;
 }
 
 .empty-state {
