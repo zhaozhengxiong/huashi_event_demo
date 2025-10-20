@@ -38,7 +38,6 @@ function MyEntriesBoard({ entries, worksMap }: MyEntriesBoardProps) {
                 {entry.resultNote && <p className='entry-note'>{entry.resultNote}</p>}
                 <div className='entry-actions'>
                   <button type='button'>直达对阵</button>
-                  <button type='button' className='ghost-button'>查看回放</button>
                   <button type='button' className='ghost-button'>复制 PK 号码</button>
                   <button type='button' className='ghost-button'>分享</button>
                 </div>
