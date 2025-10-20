@@ -6,7 +6,6 @@ import MyEntriesBoard from "./components/MyEntriesBoard";
 import PkListTable from "./components/PkListTable";
 import RegistrationForm from "./components/RegistrationForm";
 import ShippingModal from "./components/ShippingModal";
-import StageToggle from "./components/StageToggle";
 import TopNav from "./components/TopNav";
 import VotingArena from "./components/VotingArena";
 import {
@@ -22,10 +21,28 @@ import type { ActivityView, ShippingInfo, Stage, UserProfile } from "./types";
 import "./App.css";
 
 const DEFAULT_STAGE: Stage = "evaluation";
+const STAGE_ORDER: Stage[] = ["registration", "evaluation", "announcement"];
 const DEFAULT_VIEW_BY_STAGE: Record<Stage, ActivityView> = {
   registration: "home",
   evaluation: "pkList",
   announcement: "leaderboard",
+};
+
+const resolveStageFromSearch = (): Stage => {
+  if (typeof window === "undefined") {
+    return DEFAULT_STAGE;
+  }
+  const params = new URLSearchParams(window.location.search);
+  const stageParam = params.get("stage");
+  if (stageParam === null) {
+    return DEFAULT_STAGE;
+  }
+  const stageIndex = Number(stageParam);
+  if (!Number.isInteger(stageIndex)) {
+    return DEFAULT_STAGE;
+  }
+  const stageFromUrl = STAGE_ORDER[stageIndex];
+  return stageFromUrl ?? DEFAULT_STAGE;
 };
 
 const VIEW_STAGE_RULES: Record<ActivityView, Stage[]> = {
@@ -62,11 +79,10 @@ const WORKS_MAP = OC_WORKS.reduce<Record<string, (typeof OC_WORKS)[number]>>((ac
   return acc;
 }, {});
 
-const SHOW_STAGE_TOGGLE = true; // 测试环境使用，正式上线前设为 false 即可隐藏
-
 function App() {
-  const [stage, setStage] = useState<Stage>(DEFAULT_STAGE);
-  const [activeView, setActiveView] = useState<ActivityView>(DEFAULT_VIEW_BY_STAGE[DEFAULT_STAGE]);
+  const initialStage = useMemo(() => resolveStageFromSearch(), []);
+  const [stage, setStage] = useState<Stage>(initialStage);
+  const [activeView, setActiveView] = useState<ActivityView>(DEFAULT_VIEW_BY_STAGE[initialStage]);
   const [activePk, setActivePk] = useState<string | undefined>(MATCHES[0]?.pkNumber);
   const [shippingVisible, setShippingVisible] = useState(false);
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null);
@@ -107,13 +123,17 @@ function App() {
     [allowedViews]
   );
 
-  const handleStageChange = (nextStage: Stage) => {
-    setStage(nextStage);
-    setActiveView((current) => {
-      const isValid = VIEW_STAGE_RULES[current].includes(nextStage);
-      return isValid ? current : DEFAULT_VIEW_BY_STAGE[nextStage];
-    });
-  };
+  useEffect(() => {
+    const syncStageFromUrl = () => {
+      const nextStage = resolveStageFromSearch();
+      setStage((currentStage) => (currentStage === nextStage ? currentStage : nextStage));
+    };
+
+    window.addEventListener("popstate", syncStageFromUrl);
+    return () => {
+      window.removeEventListener("popstate", syncStageFromUrl);
+    };
+  }, []);
 
   const renderView = () => {
     switch (activeView) {
@@ -165,7 +185,6 @@ function App() {
 
   return (
     <div className={`app stage-${stage}`}>
-      <StageToggle stage={stage} onStageChange={handleStageChange} isVisible={SHOW_STAGE_TOGGLE} />
       <header className="app-header">
         <div>
           <h1>画时 OC PK 赛</h1>

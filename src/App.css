@@ -8,24 +8,6 @@
   gap: 1.8rem;
 }
 
-.stage-toggle {
-  position: fixed;
-  right: 2rem;
-  bottom: 2rem;
-  z-index: 20;
-  background: rgba(15, 24, 46, 0.9);
-  border: 1px solid rgba(86, 130, 255, 0.4);
-  border-radius: 12px;
-  padding: 0.75rem 1.2rem;
-  color: #bcd1ff;
-  font-size: 0.9rem;
-}
-
-.stage-toggle:hover {
-  transform: none;
-  box-shadow: 0 10px 20px rgba(86, 130, 255, 0.15);
-}
-
 .app-header {
   display: flex;
   justify-content: space-between;
@@ -884,9 +866,5 @@
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
 
-  .stage-toggle {
-    right: 1rem;
-    bottom: 1rem;
-  }
 }
 
