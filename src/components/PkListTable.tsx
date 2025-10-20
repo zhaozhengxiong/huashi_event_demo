@@ -22,7 +22,6 @@ function PkListTable({ matches, worksMap, onSelect }: PkListTableProps) {
               <th>右侧作品</th>
               <th>截止时间</th>
               <th>当前票数</th>
-              <th>操作</th>
             </tr>
           </thead>
           <tbody>
@@ -30,7 +29,18 @@ function PkListTable({ matches, worksMap, onSelect }: PkListTableProps) {
               const left = worksMap[match.left.workId]
               const right = worksMap[match.right.workId]
               return (
-                <tr key={match.pkNumber}>
+                <tr
+                  key={match.pkNumber}
+                  role='button'
+                  tabIndex={0}
+                  onClick={() => onSelect(match.pkNumber)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      onSelect(match.pkNumber)
+                    }
+                  }}
+                >
                   <td>{match.pkNumber}</td>
                   <td>
                     <div className='pk-cell'>
@@ -57,11 +67,6 @@ function PkListTable({ matches, worksMap, onSelect }: PkListTableProps) {
                       <span>:</span>
                       <span>{match.right.votes}</span>
                     </div>
-                  </td>
-                  <td>
-                    <button type='button' onClick={() => onSelect(match.pkNumber)}>
-                      去投票
-                    </button>
                   </td>
                 </tr>
               )

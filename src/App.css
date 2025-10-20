@@ -687,6 +687,20 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.pk-table tbody tr {
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.pk-table tbody tr:hover {
+  background: rgba(29, 50, 95, 0.35);
+}
+
+.pk-table tbody tr:focus-visible {
+  outline: 2px solid rgba(79, 139, 255, 0.85);
+  outline-offset: -2px;
+}
+
 .pk-table thead {
   background: rgba(14, 21, 40, 0.85);
 }
