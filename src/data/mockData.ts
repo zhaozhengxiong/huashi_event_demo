@@ -164,7 +164,33 @@ export const LEADERBOARD: LeaderboardEntry[] = [
 
 export const LOTTERY_CONFIG: LotteryConfig = {
   isUnlocked: true,
-  rewards: ['限定实体徽章', '实体画册', '双倍积分卡', '定制周边盲盒'],
+  drawsRemaining: 2,
+  rewards: [
+    {
+      id: 'reward-badge',
+      name: '限定实体徽章',
+      probability: 35,
+      imageUrl: 'https://images.unsplash.com/photo-1618005198919-d3d4b5a92eee'
+    },
+    {
+      id: 'reward-artbook',
+      name: '实体画册',
+      probability: 28,
+      imageUrl: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d'
+    },
+    {
+      id: 'reward-double-points',
+      name: '双倍积分卡',
+      probability: 22,
+      imageUrl: 'https://images.unsplash.com/photo-1523475472560-d2df97ec485c'
+    },
+    {
+      id: 'reward-mystery-box',
+      name: '定制周边盲盒',
+      probability: 15,
+      imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30'
+    }
+  ],
   history: [
     { id: 'lot-1', reward: '双倍积分卡', date: '2025-10-18 21:32' },
     { id: 'lot-2', reward: '限定实体徽章', date: '2025-10-18 21:34' }
