@@ -24,7 +24,7 @@ import './App.css'
 const DEFAULT_STAGE: Stage = 'evaluation'
 const DEFAULT_VIEW_BY_STAGE: Record<Stage, ActivityView> = {
   registration: 'home',
-  evaluation: 'vote',
+  evaluation: 'pkList',
   announcement: 'home'
 }
 
