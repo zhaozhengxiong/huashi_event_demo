@@ -1,6 +1,7 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ActivityMeta, Match, OcWork } from '../types'
 import WorkGallery from './WorkGallery'
+import PkNumberSearch from './PkNumberSearch'
 
 type VoteResult = 'left' | 'right' | 'skip'
 
@@ -15,8 +16,6 @@ interface VotingArenaProps {
 function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: VotingArenaProps) {
   const [internalPk, setInternalPk] = useState(matches[0]?.pkNumber ?? '')
   const [voteHistory, setVoteHistory] = useState<Record<string, VoteResult>>({})
-  const [pkInput, setPkInput] = useState('')
-
   const currentPk = activePk ?? internalPk
 
   const setPk = useCallback(
@@ -27,7 +26,6 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
       if (activePk === undefined) {
         setInternalPk(pkNumber)
       }
-      setPkInput('')
     },
     [onActivePkChange, activePk]
   )
@@ -66,15 +64,12 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
     }
   }
 
-  const handlePkSearch = () => {
-    if (!pkInput.trim()) {
-      return
-    }
-    const target = matches.find((match) => match.pkNumber.toLowerCase() === pkInput.trim().toLowerCase())
-    if (target) {
-      setPk(target.pkNumber)
-    }
-  }
+  const handlePkSearch = useCallback(
+    (pkNumber: string) => {
+      setPk(pkNumber)
+    },
+    [setPk]
+  )
 
   if (!currentMatch) {
     return <div className='empty-state'>暂无对阵，请稍后再来。</div>
@@ -114,17 +109,7 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
           <strong>{meta.remainingTimeLabel}</strong>
         </div>
       </header>
-      <div className='pk-search'>
-        <input
-          type='text'
-          placeholder='输入 PK 号码直达'
-          value={pkInput}
-          onChange={(event) => setPkInput(event.target.value)}
-        />
-        <button type='button' onClick={handlePkSearch}>
-          前往
-        </button>
-      </div>
+      <PkNumberSearch matches={matches} onNavigate={handlePkSearch} />
       <div className='arena-body'>
         <article className={`arena-card${currentVote === 'left' ? ' is-picked' : ''}`}>
           <header>
