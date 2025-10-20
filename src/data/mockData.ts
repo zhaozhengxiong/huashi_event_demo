@@ -164,6 +164,7 @@ export const LEADERBOARD: LeaderboardEntry[] = [
 
 export const LOTTERY_CONFIG: LotteryConfig = {
   isUnlocked: true,
+  drawsRemaining: 2,
   rewards: ['限定实体徽章', '实体画册', '双倍积分卡', '定制周边盲盒'],
   history: [
     { id: 'lot-1', reward: '双倍积分卡', date: '2025-10-18 21:32' },

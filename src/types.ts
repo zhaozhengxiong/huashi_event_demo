@@ -65,6 +65,7 @@ export interface LeaderboardEntry {
 
 export interface LotteryConfig {
   isUnlocked: boolean
+  drawsRemaining: number
   rewards: string[]
   history: Array<{ id: string; reward: string; date: string }>
 }
