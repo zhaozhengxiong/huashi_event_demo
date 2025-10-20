@@ -760,10 +760,63 @@
   border-radius: 12px;
 }
 
-.vote-meter {
+.pk-vote-progress {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.pk-vote-track {
   display: flex;
-  gap: 0.3rem;
+  width: 100%;
+  height: 28px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pk-vote-segment {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-weight: 600;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.92);
+  transition: width 0.3s ease;
+}
+
+.pk-vote-segment-left {
+  background: linear-gradient(90deg, rgba(109, 164, 255, 0.95), rgba(73, 116, 247, 0.95));
+}
+
+.pk-vote-segment-right {
+  background: linear-gradient(90deg, rgba(255, 134, 90, 0.95), rgba(254, 99, 128, 0.95));
+}
+
+.pk-vote-segment span {
+  padding: 0 0.6rem;
+  white-space: nowrap;
+}
+
+.pk-vote-summary,
+.pk-vote-extra {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: rgba(206, 216, 255, 0.76);
+}
+
+.pk-vote-count-left {
+  color: rgba(195, 220, 255, 0.92);
+}
+
+.pk-vote-count-right {
+  color: rgba(255, 206, 191, 0.92);
+}
+
+.pk-vote-extra {
+  font-size: 0.8rem;
+  opacity: 0.85;
 }
 
 .leader-podium {

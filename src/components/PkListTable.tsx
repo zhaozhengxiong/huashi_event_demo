@@ -54,14 +54,16 @@ function PkListTable({ matches, worksMap, onSelect, meta }: PkListTableProps) {
               <th>PK 号</th>
               <th>左侧作品</th>
               <th>右侧作品</th>
-              <th>截止时间</th>
-              <th>当前票数</th>
+              <th>投票进度</th>
             </tr>
           </thead>
           <tbody>
             {matches.map((match) => {
               const left = worksMap[match.left.workId]
               const right = worksMap[match.right.workId]
+              const totalVotes = match.left.votes + match.right.votes
+              const leftPercent = totalVotes > 0 ? (match.left.votes / totalVotes) * 100 : 50
+              const rightPercent = 100 - leftPercent
               return (
                 <tr
                   key={match.pkNumber}
@@ -94,12 +96,36 @@ function PkListTable({ matches, worksMap, onSelect, meta }: PkListTableProps) {
                       </div>
                     </div>
                   </td>
-                  <td>{new Date(match.deadline).toLocaleString('zh-CN', { hour12: false })}</td>
                   <td>
-                    <div className='vote-meter'>
-                      <span>{match.left.votes}</span>
-                      <span>:</span>
-                      <span>{match.right.votes}</span>
+                    <div className='pk-vote-progress'>
+                      <div
+                        className='pk-vote-track'
+                        role='group'
+                        aria-label={`${left?.title ?? '左侧作品'}与${right?.title ?? '右侧作品'}的投票进度`}
+                      >
+                        <div
+                          className='pk-vote-segment pk-vote-segment-left'
+                          style={{ width: `${leftPercent}%` }}
+                        >
+                          <span>{match.left.votes}票</span>
+                        </div>
+                        <div
+                          className='pk-vote-segment pk-vote-segment-right'
+                          style={{ width: `${rightPercent}%` }}
+                        >
+                          <span>{match.right.votes}票</span>
+                        </div>
+                      </div>
+                      <div className='pk-vote-summary'>
+                        <span className='pk-vote-count pk-vote-count-left'>左侧：{match.left.votes}票</span>
+                        <span className='pk-vote-count pk-vote-count-right'>右侧：{match.right.votes}票</span>
+                      </div>
+                      <div className='pk-vote-extra'>
+                        <span>总票数：{totalVotes}</span>
+                        <span>
+                          {Math.round(leftPercent)}% : {Math.round(rightPercent)}%
+                        </span>
+                      </div>
                     </div>
                   </td>
                 </tr>
