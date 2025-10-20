@@ -1,4 +1,6 @@
-﻿export type Stage = 'registration' | 'evaluation' | 'announcement'
+export type Stage = 'registration' | 'evaluation' | 'announcement'
+
+export type StageVariant = 'registration' | 'evaluation-32' | 'evaluation-8' | 'announcement'
 
 export type ActivityView =
   | 'home'
