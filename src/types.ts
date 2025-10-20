@@ -94,5 +94,6 @@ export interface UserProfile {
   id: string
   nickname: string
   isWinner: boolean
+  avatarUrl: string
 }
 

@@ -72,6 +72,7 @@ const userProfile: UserProfile = {
   id: "user-demo",
   nickname: "风之河",
   isWinner: true,
+  avatarUrl: "https://avatars.githubusercontent.com/u/583231?v=4",
 };
 
 // 将作品列表映射为索引，便于快速查找
@@ -207,8 +208,8 @@ function App() {
           <p>激发原创角色灵感，见证每一场逆袭与荣耀。</p>
         </div>
         <div className="user-chip">
+          <img className="chip-avatar" src={userProfile.avatarUrl} alt={`${userProfile.nickname} 的头像`} />
           <span className="chip-name">{userProfile.nickname}</span>
-          <span className="chip-role">参赛选手</span>
         </div>
       </header>
       <TopNav items={navItems} activeView={activeView} onSelect={(view) => setActiveView(view)} />
