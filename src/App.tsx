@@ -120,7 +120,9 @@ function App() {
       setActivePk(undefined);
       return;
     }
-    setActivePk((current) => (current && matches.some((match) => match.pkNumber === current) ? current : matches[0].pkNumber));
+    setActivePk((current) =>
+      current && matches.some((match) => match.pkNumber === current) ? current : matches[0].pkNumber
+    );
   }, [matches]);
 
   const handlePkNavigate = useCallback(
@@ -169,9 +171,7 @@ function App() {
   useEffect(() => {
     const syncStageFromUrl = () => {
       const nextStage = resolveStageFromSearch();
-      setStageState((currentStage) =>
-        currentStage.index === nextStage.index ? currentStage : nextStage
-      );
+      setStageState((currentStage) => (currentStage.index === nextStage.index ? currentStage : nextStage));
     };
 
     window.addEventListener("popstate", syncStageFromUrl);
@@ -234,7 +234,7 @@ function App() {
       <header className="app-header">
         <div>
           <h1>画时 OC PK 赛</h1>
-          <p>激发原创角色灵感，见证每一场逆袭与荣耀。</p>
+          <p>让想象变成世界的主角，让创作点燃你的宇宙！</p>
         </div>
         <div className="user-chip">
           <img className="chip-avatar" src={userProfile.avatarUrl} alt={`${userProfile.nickname} 的头像`} />
