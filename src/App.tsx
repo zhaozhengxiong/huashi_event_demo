@@ -70,9 +70,20 @@ function App() {
   const [activePk, setActivePk] = useState<string | undefined>(MATCHES[0]?.pkNumber)
   const [shippingVisible, setShippingVisible] = useState(false)
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null)
+  const [registrationVisible, setRegistrationVisible] = useState(false)
+
+  const allowedViews = useMemo(
+    () =>
+      NAV_ORDER.filter((view) => {
+        if (stage === 'registration' && view === 'register') {
+          return false
+        }
+        return VIEW_STAGE_RULES[view].includes(stage)
+      }),
+    [stage]
+  )
 
   useEffect(() => {
-    const allowedViews = NAV_ORDER.filter((view) => VIEW_STAGE_RULES[view].includes(stage))
     if (!allowedViews.includes(activeView)) {
       setActiveView(DEFAULT_VIEW_BY_STAGE[stage])
     }
@@ -82,15 +93,18 @@ function App() {
     if (stage !== 'announcement') {
       setShippingVisible(false)
     }
-  }, [stage, activeView, shippingInfo])
+    if (stage !== 'registration') {
+      setRegistrationVisible(false)
+    }
+  }, [stage, activeView, shippingInfo, allowedViews])
 
   const navItems = useMemo(
     () =>
-      NAV_ORDER.filter((view) => VIEW_STAGE_RULES[view].includes(stage)).map((view) => ({
+      allowedViews.map((view) => ({
         view,
         label: VIEW_LABEL[view]
       })),
-    [stage]
+    [allowedViews]
   )
 
   const handleStageChange = (nextStage: Stage) => {
@@ -112,10 +126,11 @@ function App() {
             leaderboard={LEADERBOARD}
             worksMap={WORKS_MAP}
             onNavigate={(view) => setActiveView(view)}
+            onOpenRegistration={() => setRegistrationVisible(true)}
           />
         )
       case 'register':
-        return <RegistrationForm works={OC_WORKS} />
+        return null
       case 'vote':
         return (
           <VotingArena
@@ -178,6 +193,25 @@ function App() {
           setShippingVisible(false)
         }}
       />
+      {stage === 'registration' && registrationVisible && (
+        <div className='modal-mask'>
+          <div className='modal registration-modal'>
+            <header>
+              <h3>报名入口</h3>
+              <button
+                type='button'
+                className='ghost-button'
+                onClick={() => setRegistrationVisible(false)}
+              >
+                关闭
+              </button>
+            </header>
+            <div className='modal-body'>
+              <RegistrationForm works={OC_WORKS} />
+            </div>
+          </div>
+        </div>
+      )}
       {shippingInfo && (
         <div className='shipping-review'>
           <strong>邮寄信息已提交</strong>

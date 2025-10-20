@@ -1,4 +1,4 @@
-﻿import type { ActivityMeta, ActivityView, LeaderboardEntry, OcWork, RegistrationConfig, Stage } from '../types'
+import type { ActivityMeta, ActivityView, LeaderboardEntry, OcWork, RegistrationConfig, Stage } from '../types'
 
 interface ActivityHomeProps {
   stage: Stage
@@ -7,6 +7,7 @@ interface ActivityHomeProps {
   leaderboard: LeaderboardEntry[]
   worksMap: Record<string, OcWork>
   onNavigate: (view: ActivityView) => void
+  onOpenRegistration: () => void
 }
 
 const STAGE_HEADLINE: Record<Stage, string> = {
@@ -15,7 +16,15 @@ const STAGE_HEADLINE: Record<Stage, string> = {
   announcement: '最终榜单揭晓，恭喜获奖的创作者们'
 }
 
-function ActivityHome({ stage, registration, meta, leaderboard, worksMap, onNavigate }: ActivityHomeProps) {
+function ActivityHome({
+  stage,
+  registration,
+  meta,
+  leaderboard,
+  worksMap,
+  onNavigate,
+  onOpenRegistration
+}: ActivityHomeProps) {
   const renderRegistration = () => (
     <div className='home-panel'>
       <div className='home-section'>
@@ -39,7 +48,7 @@ function ActivityHome({ stage, registration, meta, leaderboard, worksMap, onNavi
           <span className='home-stat'>{registration.enrollmentCount}</span>
           <span> 人已报名</span>
         </div>
-        <button type='button' onClick={() => onNavigate('register')}>
+        <button type='button' onClick={onOpenRegistration}>
           立即报名
         </button>
       </div>
