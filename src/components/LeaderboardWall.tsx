@@ -7,14 +7,33 @@ interface LeaderboardWallProps {
 }
 
 function LeaderboardWall({ entries, worksMap, stage }: LeaderboardWallProps) {
-  const podium = entries.filter((entry) => entry.rank <= 3)
-  const others = entries.filter((entry) => entry.rank > 3)
+  const topEntries = [...entries].sort((a, b) => a.rank - b.rank).slice(0, 8)
+  const podium = topEntries.filter((entry) => entry.rank <= 3)
+  const others = topEntries.filter((entry) => entry.rank > 3)
+
+  const getCardClassName = (entry: LeaderboardEntry) => {
+    if (entry.rank === 1) {
+      return 'leader-card leader-card--podium leader-card--first'
+    }
+    if (entry.rank === 2) {
+      return 'leader-card leader-card--podium leader-card--second'
+    }
+    if (entry.rank === 3) {
+      return 'leader-card leader-card--podium leader-card--third'
+    }
+    return 'leader-card'
+  }
 
   const renderCard = (entry: LeaderboardEntry) => {
     const work = worksMap[entry.workId]
     return (
-      <article key={entry.workId} className='leader-card'>
-        <div className='leader-rank'>#{entry.rank}</div>
+      <article key={entry.workId} className={getCardClassName(entry)}>
+        <div className='leader-rank'>
+          <span className='leader-rank-number'>#{entry.rank}</span>
+          {entry.rank <= 3 && (
+            <span className='leader-rank-medal'>{entry.award ?? 'TOP3'}</span>
+          )}
+        </div>
         <img src={work?.coverImages[0]} alt={work?.title ?? '作品'} />
         <h3>{work?.title ?? '未知作品'}</h3>
         <p>创作者：{work?.creator ?? '—'}</p>

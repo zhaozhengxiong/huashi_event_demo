@@ -72,6 +72,72 @@ export const OC_WORKS: OcWork[] = [
       favorites: 6188,
       comments: 377
     }
+  },
+  {
+    id: 'work-starseer',
+    title: '星脉占梦师',
+    creator: '北辰',
+    coverImages: [
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1200&q=80'
+    ],
+    tags: ['玄幻', '星象'],
+    synopsis: '在星图间穿梭的占梦师，能为迷失者捕捉未来的回响。',
+    highlight: '她的星脉罗盘能同步整个星域的脉动。',
+    stats: {
+      likes: 8120,
+      favorites: 4521,
+      comments: 389
+    }
+  },
+  {
+    id: 'work-inkguard',
+    title: '墨域守门人',
+    creator: '丹青客',
+    coverImages: [
+      'https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=1200&q=80'
+    ],
+    tags: ['武侠', '守护'],
+    synopsis: '以墨化刃守护书城边界的守门人，将传说封存于卷轴之中。',
+    highlight: '墨刃挥落时能暂存时间，护送旅人安全通过。',
+    stats: {
+      likes: 7688,
+      favorites: 4210,
+      comments: 345
+    }
+  },
+  {
+    id: 'work-riftchef',
+    title: '裂隙厨师',
+    creator: '南风铺子',
+    coverImages: [
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1493770348161-369560ae357d?auto=format&fit=crop&w=1200&q=80'
+    ],
+    tags: ['奇趣', '美食'],
+    synopsis: '能在次元裂隙中烹饪的厨师，把失落的味觉重新缝合。',
+    highlight: '他的器具可捕捉异空间香气，转化为现实味道。',
+    stats: {
+      likes: 7021,
+      favorites: 3895,
+      comments: 298
+    }
+  },
+  {
+    id: 'work-windcarver',
+    title: '风痕雕翼师',
+    creator: '夏墨',
+    coverImages: [
+      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1200&q=80'
+    ],
+    tags: ['工艺', '飞行'],
+    synopsis: '为浮空城打造羽翼的雕刻师，以风痕铭刻每一次飞翔。',
+    highlight: '能为飞行者量身雕刻共鸣羽翼，增强气流掌控。',
+    stats: {
+      likes: 6810,
+      favorites: 3544,
+      comments: 276
+    }
   }
 ]
 
@@ -159,7 +225,11 @@ export const LEADERBOARD: LeaderboardEntry[] = [
   { rank: 1, workId: 'work-neo-aurora', award: '冠军' },
   { rank: 2, workId: 'work-clocktailor', award: '亚军' },
   { rank: 3, workId: 'work-mistrider', award: '季军' },
-  { rank: 4, workId: 'work-sandbard' }
+  { rank: 4, workId: 'work-sandbard' },
+  { rank: 5, workId: 'work-starseer' },
+  { rank: 6, workId: 'work-inkguard' },
+  { rank: 7, workId: 'work-riftchef' },
+  { rank: 8, workId: 'work-windcarver' }
 ]
 
 export const LOTTERY_CONFIG: LotteryConfig = {
