@@ -436,6 +436,77 @@
   align-items: start;
 }
 
+.arena-vote-progress {
+  background: rgba(14, 21, 40, 0.65);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1rem 1.2rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.arena-vote-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.95rem;
+  color: rgba(206, 216, 255, 0.78);
+}
+
+.arena-vote-track {
+  display: flex;
+  width: 100%;
+  height: 32px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.arena-vote-segment {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.92);
+  transition: width 0.3s ease;
+  min-width: 0;
+}
+
+.arena-vote-segment span {
+  padding: 0 0.8rem;
+  white-space: nowrap;
+}
+
+.arena-vote-segment-left {
+  background: linear-gradient(90deg, rgba(109, 164, 255, 0.95), rgba(73, 116, 247, 0.95));
+}
+
+.arena-vote-segment-right {
+  background: linear-gradient(90deg, rgba(255, 134, 90, 0.95), rgba(254, 99, 128, 0.95));
+}
+
+.arena-vote-summary,
+.arena-vote-extra {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: rgba(206, 216, 255, 0.76);
+}
+
+.arena-vote-count-left {
+  color: rgba(195, 220, 255, 0.92);
+}
+
+.arena-vote-count-right {
+  color: rgba(255, 206, 191, 0.92);
+}
+
+.arena-vote-extra {
+  opacity: 0.85;
+}
+
 .arena-card {
   background: rgba(14, 21, 40, 0.75);
   border-radius: 18px;

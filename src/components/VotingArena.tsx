@@ -125,7 +125,23 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
   })
 
   const currentMatchVotes = matchVotes[currentMatch.pkNumber]
+  const leftVotes = currentMatch.left.votes + (currentMatchVotes?.left ?? 0)
+  const rightVotes = currentMatch.right.votes + (currentMatchVotes?.right ?? 0)
   const totalVotesForCurrent = (currentMatchVotes?.left ?? 0) + (currentMatchVotes?.right ?? 0)
+  const combinedVotes = leftVotes + rightVotes
+  const showNeutralProgress = combinedVotes === 0
+  const leftVoteRatio = showNeutralProgress ? 0.5 : leftVotes / combinedVotes
+  const rightVoteRatio = showNeutralProgress ? 0.5 : rightVotes / combinedVotes
+  const leftVotePercent = showNeutralProgress ? 0 : Math.round(leftVoteRatio * 100)
+  const rightVotePercent = showNeutralProgress ? 0 : Math.round(rightVoteRatio * 100)
+  const progressAriaMax = combinedVotes === 0 ? 1 : combinedVotes
+  const voteLeadDiff = Math.abs(leftVotes - rightVotes)
+  const voteLeadLabel =
+    voteLeadDiff === 0
+      ? '当前双方票数持平'
+      : leftVotes > rightVotes
+        ? `${leftWork?.title ?? '左侧作品'}领先 ${voteLeadDiff} 票`
+        : `${rightWork?.title ?? '右侧作品'}领先 ${voteLeadDiff} 票`
   const paidVotesForCurrent = totalVotesForCurrent > 1 ? totalVotesForCurrent - 1 : 0
   const voteRuleLabel = totalVotesForCurrent
     ? paidVotesForCurrent
@@ -170,8 +186,11 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
           <WorkGallery title={leftWork?.title ?? '作品'} images={leftWork?.coverImages ?? []} />
           <footer>
             <div className='score'>
-              得票：{currentMatch.left.votes}
-              <span>（评分 {currentMatch.left.score}）</span>
+              得票：{leftVotes}
+              <span>
+                （评分 {currentMatch.left.score}
+                {combinedVotes > 0 ? `，占比 ${leftVotePercent}%` : ''}）
+              </span>
             </div>
             <p>{leftWork?.highlight}</p>
           </footer>
@@ -186,13 +205,62 @@ function VotingArena({ matches, worksMap, meta, activePk, onActivePkChange }: Vo
           <WorkGallery title={rightWork?.title ?? '作品'} images={rightWork?.coverImages ?? []} />
           <footer>
             <div className='score'>
-              得票：{currentMatch.right.votes}
-              <span>（评分 {currentMatch.right.score}）</span>
+              得票：{rightVotes}
+              <span>
+                （评分 {currentMatch.right.score}
+                {combinedVotes > 0 ? `，占比 ${rightVotePercent}%` : ''}）
+              </span>
             </div>
             <p>{rightWork?.highlight}</p>
           </footer>
           <button type='button' className='ghost-button'>查看作品详情</button>
         </article>
+      </div>
+      <div className='arena-vote-progress'>
+        <div className='arena-vote-progress-header'>
+          <span>实时投票情况</span>
+          <span>总票数：{combinedVotes}</span>
+        </div>
+        <div
+          className='arena-vote-track'
+          role='group'
+          aria-label={`${leftWork?.title ?? '左侧作品'}与${rightWork?.title ?? '右侧作品'}的实时投票进度`}
+        >
+          <div
+            className='arena-vote-segment arena-vote-segment-left'
+            style={{ width: `${leftVoteRatio * 100}%` }}
+            role='progressbar'
+            aria-valuemin={0}
+            aria-valuemax={progressAriaMax}
+            aria-valuenow={leftVotes}
+            aria-label={`${leftWork?.title ?? '左侧作品'}累计 ${leftVotes} 票`}
+          >
+            <span>{leftVotes}票</span>
+          </div>
+          <div
+            className='arena-vote-segment arena-vote-segment-right'
+            style={{ width: `${rightVoteRatio * 100}%` }}
+            role='progressbar'
+            aria-valuemin={0}
+            aria-valuemax={progressAriaMax}
+            aria-valuenow={rightVotes}
+            aria-label={`${rightWork?.title ?? '右侧作品'}累计 ${rightVotes} 票`}
+          >
+            <span>{rightVotes}票</span>
+          </div>
+        </div>
+        <div className='arena-vote-summary'>
+          <span className='arena-vote-count arena-vote-count-left'>左侧：{leftVotes}票</span>
+          <span className='arena-vote-count arena-vote-count-right'>右侧：{rightVotes}票</span>
+        </div>
+        <div className='arena-vote-extra'>
+          <span>{voteLeadLabel}</span>
+          <span>
+            {showNeutralProgress
+              ? '暂无投票'
+              : `${leftVotePercent}% : ${rightVotePercent}%`}
+          </span>
+        </div>
       </div>
       <div className='arena-actions'>
         <button type='button' onClick={() => handleVote('left')}>
