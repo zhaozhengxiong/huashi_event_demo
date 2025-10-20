@@ -25,11 +25,11 @@ const DEFAULT_STAGE: Stage = 'evaluation'
 const DEFAULT_VIEW_BY_STAGE: Record<Stage, ActivityView> = {
   registration: 'home',
   evaluation: 'vote',
-  announcement: 'home'
+  announcement: 'leaderboard'
 }
 
 const VIEW_STAGE_RULES: Record<ActivityView, Stage[]> = {
-  home: ['registration', 'evaluation', 'announcement'],
+  home: ['registration', 'evaluation'],
   register: ['registration'],
   vote: ['evaluation', 'announcement'],
   myEntries: ['evaluation', 'announcement'],
