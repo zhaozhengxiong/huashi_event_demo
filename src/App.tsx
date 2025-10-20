@@ -88,6 +88,15 @@ function App() {
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null);
   const [registrationVisible, setRegistrationVisible] = useState(false);
 
+  const myWinningEntry = useMemo(() => {
+    const myWorkIds = new Set(MY_ENTRIES.map((entry) => entry.workId));
+    return LEADERBOARD.find((entry) => myWorkIds.has(entry.workId));
+  }, []);
+  const winnerWork = useMemo(
+    () => (myWinningEntry ? WORKS_MAP[myWinningEntry.workId] : undefined),
+    [myWinningEntry]
+  );
+
   const allowedViews = useMemo(
     () =>
       NAV_ORDER.filter((view) => {
@@ -175,7 +184,7 @@ function App() {
           />
         );
       case "leaderboard":
-        return <LeaderboardWall entries={LEADERBOARD} worksMap={WORKS_MAP} />;
+        return <LeaderboardWall entries={LEADERBOARD} worksMap={WORKS_MAP} stage={stage} />;
       case "lottery":
         return <LotteryPanel config={LOTTERY_CONFIG} />;
       default:
@@ -207,6 +216,8 @@ function App() {
           setShippingInfo(info);
           setShippingVisible(false);
         }}
+        winnerWorkTitle={winnerWork?.title}
+        winnerAward={myWinningEntry?.award}
       />
       {stage === "registration" && registrationVisible && (
         <div className="modal-mask">

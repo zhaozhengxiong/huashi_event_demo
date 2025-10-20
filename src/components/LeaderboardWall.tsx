@@ -1,11 +1,12 @@
-﻿import type { LeaderboardEntry, OcWork } from '../types'
+import type { LeaderboardEntry, OcWork, Stage } from '../types'
 
 interface LeaderboardWallProps {
   entries: LeaderboardEntry[]
   worksMap: Record<string, OcWork>
+  stage: Stage
 }
 
-function LeaderboardWall({ entries, worksMap }: LeaderboardWallProps) {
+function LeaderboardWall({ entries, worksMap, stage }: LeaderboardWallProps) {
   const podium = entries.filter((entry) => entry.rank <= 3)
   const others = entries.filter((entry) => entry.rank > 3)
 
@@ -26,17 +27,19 @@ function LeaderboardWall({ entries, worksMap }: LeaderboardWallProps) {
     <section className='leaderboard'>
       <header>
         <h2>最终榜单</h2>
-        <p>获奖作品支持一键生成证书海报，分享荣耀时刻。</p>
-        <button type='button' className='ghost-button'>生成获奖证书</button>
+        {stage === 'announcement' ? (
+          <p>公示期榜单展示中，敬请关注颁奖信息。</p>
+        ) : (
+          <>
+            <p>获奖作品支持一键生成证书海报，分享荣耀时刻。</p>
+            <button type='button' className='ghost-button'>生成获奖证书</button>
+          </>
+        )}
       </header>
       <div className='leader-podium'>{podium.map(renderCard)}</div>
-      {others.length > 0 && (
-        <div className='leader-grid'>{others.map(renderCard)}</div>
-      )}
+      {others.length > 0 && <div className='leader-grid'>{others.map(renderCard)}</div>}
     </section>
   )
 }
 
 export default LeaderboardWall
-
-

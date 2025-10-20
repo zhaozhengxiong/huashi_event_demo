@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import type { ShippingInfo } from '../types'
 
@@ -6,9 +6,11 @@ interface ShippingModalProps {
   visible: boolean
   onClose: () => void
   onSubmit: (info: ShippingInfo) => void
+  winnerWorkTitle?: string
+  winnerAward?: string
 }
 
-function ShippingModal({ visible, onClose, onSubmit }: ShippingModalProps) {
+function ShippingModal({ visible, onClose, onSubmit, winnerWorkTitle, winnerAward }: ShippingModalProps) {
   const [form, setForm] = useState<ShippingInfo>({ name: '', phone: '', address: '' })
 
   if (!visible) {
@@ -20,6 +22,11 @@ function ShippingModal({ visible, onClose, onSubmit }: ShippingModalProps) {
     onSubmit(form)
   }
 
+  const displayTitle = winnerWorkTitle ?? '参赛作品'
+  const baseAward = winnerAward ?? '荣誉'
+  const awardLabel = baseAward.endsWith('奖') ? baseAward : `${baseAward}奖`
+  const celebrateMessage = `恭喜您的作品《${displayTitle}》获得了${awardLabel}！请填写领取奖品的信息`
+
   return (
     <div className='modal-mask'>
       <div className='modal'>
@@ -29,6 +36,7 @@ function ShippingModal({ visible, onClose, onSubmit }: ShippingModalProps) {
             关闭
           </button>
         </header>
+        <p className='modal-message'>{celebrateMessage}</p>
         <form onSubmit={handleSubmit}>
           <label>
             收件人
