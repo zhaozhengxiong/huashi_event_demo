@@ -1,17 +1,27 @@
-import { useMemo, useState, type KeyboardEvent } from 'react'
+import { useEffect, useMemo, useState, type KeyboardEvent } from 'react'
+import { CREATOR_SUGGESTIONS } from '../data/mockData'
 import type { OcWork } from '../types'
 
 interface RegistrationFormProps {
   works: OcWork[]
 }
 
+interface ShareTarget {
+  id: string
+  nickname: string
+  avatarUrl: string
+  isCustom?: boolean
+}
+
 function RegistrationForm({ works }: RegistrationFormProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [remarkMap, setRemarkMap] = useState<Record<string, { title: string; highlight: string }>>({})
   const [successModalVisible, setSuccessModalVisible] = useState(false)
-  const [shareNicknames, setShareNicknames] = useState<string[]>([])
+  const [shareTargets, setShareTargets] = useState<ShareTarget[]>([])
   const [nicknameInput, setNicknameInput] = useState('')
   const [shareFeedback, setShareFeedback] = useState<string | null>(null)
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0)
+  const [suggestionVisible, setSuggestionVisible] = useState(false)
 
   const handleToggle = (id: string) => {
     setSelectedIds((prev) =>
@@ -37,46 +47,111 @@ function RegistrationForm({ works }: RegistrationFormProps) {
     setShareFeedback(null)
   }
 
-  const handleAddNickname = () => {
+  const filteredSuggestions = useMemo(() => {
+    const keyword = nicknameInput.trim().toLowerCase()
+    if (!keyword) {
+      return []
+    }
+    return CREATOR_SUGGESTIONS.filter((suggestion) => {
+      if (shareTargets.some((target) => target.id === suggestion.id)) {
+        return false
+      }
+      return suggestion.nickname.toLowerCase().includes(keyword)
+    })
+  }, [nicknameInput, shareTargets])
+
+  useEffect(() => {
+    setActiveSuggestionIndex(0)
+  }, [filteredSuggestions.length])
+
+  const handleNicknameInputChange = (value: string) => {
+    setNicknameInput(value)
+    setShareFeedback(null)
+    setSuggestionVisible(Boolean(value.trim()))
+  }
+
+  const addShareTarget = (target: ShareTarget) => {
+    setShareTargets((prev) => [...prev, target])
+    setNicknameInput('')
+    setShareFeedback(null)
+    setSuggestionVisible(false)
+  }
+
+  const handleAddCustomNickname = () => {
     const trimmed = nicknameInput.trim()
     if (!trimmed) {
       return
     }
-    if (shareNicknames.includes(trimmed)) {
+    if (shareTargets.some((target) => target.nickname === trimmed)) {
       setShareFeedback(`已添加 ${trimmed}，无需重复输入`)
       setNicknameInput('')
+      setSuggestionVisible(false)
       return
     }
-    setShareNicknames((prev) => [...prev, trimmed])
-    setNicknameInput('')
-    setShareFeedback(null)
+    addShareTarget({
+      id: `custom-${trimmed}`,
+      nickname: trimmed,
+      avatarUrl: '',
+      isCustom: true
+    })
+  }
+
+  const handleSelectSuggestion = (suggestion: ShareTarget) => {
+    addShareTarget(suggestion)
   }
 
   const handleNicknameKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (!filteredSuggestions.length) {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        handleAddCustomNickname()
+      }
+      return
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setSuggestionVisible(true)
+      setActiveSuggestionIndex((prev) => (prev + 1) % filteredSuggestions.length)
+      return
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      setSuggestionVisible(true)
+      setActiveSuggestionIndex((prev) =>
+        prev - 1 < 0 ? filteredSuggestions.length - 1 : prev - 1
+      )
+      return
+    }
     if (event.key === 'Enter') {
       event.preventDefault()
-      handleAddNickname()
+      handleSelectSuggestion(filteredSuggestions[activeSuggestionIndex])
+      return
+    }
+    if (event.key === 'Escape') {
+      setSuggestionVisible(false)
     }
   }
 
-  const handleRemoveNickname = (nickname: string) => {
-    setShareNicknames((prev) => prev.filter((item) => item !== nickname))
+  const handleRemoveNickname = (targetId: string) => {
+    setShareTargets((prev) => prev.filter((item) => item.id !== targetId))
   }
 
   const handleShare = () => {
-    if (!shareNicknames.length) {
+    if (!shareTargets.length) {
       setShareFeedback('请至少输入一个需要通知的昵称')
       return
     }
-    setShareFeedback(`已通过站内消息通知 ${shareNicknames.join('、')}，祝你比赛顺利！`)
-    setShareNicknames([])
+    const nicknames = shareTargets.map((target) => target.nickname)
+    setShareFeedback(`已通过站内消息通知 ${nicknames.join('、')}，祝你比赛顺利！`)
+    setShareTargets([])
   }
 
   const handleCloseModal = () => {
     setSuccessModalVisible(false)
-    setShareNicknames([])
+    setShareTargets([])
     setNicknameInput('')
     setShareFeedback(null)
+    setSuggestionVisible(false)
   }
 
   const selectedWorks = useMemo(
@@ -174,24 +249,77 @@ function RegistrationForm({ works }: RegistrationFormProps) {
                 <label>
                   邀请好友
                   <div className='share-nickname-input'>
-                    <input
-                      type='text'
-                      value={nicknameInput}
-                      onChange={(event) => setNicknameInput(event.target.value)}
-                      onKeyDown={handleNicknameKeyDown}
-                      placeholder='输入昵称后回车，支持多个'
-                    />
-                    <button type='button' onClick={handleAddNickname}>
+                    <div className='share-nickname-input-field'>
+                      <input
+                        type='text'
+                        value={nicknameInput}
+                        onChange={(event) => handleNicknameInputChange(event.target.value)}
+                        onKeyDown={handleNicknameKeyDown}
+                        onFocus={() => setSuggestionVisible(Boolean(filteredSuggestions.length))}
+                        onBlur={() => setTimeout(() => setSuggestionVisible(false), 120)}
+                        placeholder='输入昵称后回车，支持多个'
+                        aria-autocomplete='list'
+                        aria-expanded={suggestionVisible}
+                        aria-activedescendant={
+                          suggestionVisible && filteredSuggestions.length
+                            ? filteredSuggestions[activeSuggestionIndex].id
+                            : undefined
+                        }
+                      />
+                      {suggestionVisible && filteredSuggestions.length > 0 && (
+                        <ul className='share-suggestion-panel' role='listbox'>
+                          {filteredSuggestions.map((suggestion, index) => (
+                            <li
+                              key={suggestion.id}
+                              id={suggestion.id}
+                              className={`share-suggestion-item${
+                                index === activeSuggestionIndex ? ' is-active' : ''
+                              }`}
+                              role='option'
+                              aria-selected={index === activeSuggestionIndex}
+                            >
+                              <button
+                                type='button'
+                                onMouseDown={(event) => {
+                                  event.preventDefault()
+                                  handleSelectSuggestion(suggestion)
+                                }}
+                              >
+                                <img src={suggestion.avatarUrl} alt='' className='share-suggestion-avatar' />
+                                <span>{suggestion.nickname}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                    <button type='button' onClick={handleAddCustomNickname}>
                       添加
                     </button>
                   </div>
                 </label>
-                {shareNicknames.length > 0 && (
+                {shareTargets.length > 0 && (
                   <ul className='share-nickname-list'>
-                    {shareNicknames.map((nickname) => (
-                      <li key={nickname}>
-                        <span>{nickname}</span>
-                        <button type='button' onClick={() => handleRemoveNickname(nickname)} aria-label={`移除 ${nickname}`}>
+                    {shareTargets.map((target) => (
+                      <li key={target.id}>
+                        {target.avatarUrl ? (
+                          <img
+                            src={target.avatarUrl}
+                            alt=''
+                            className='share-nickname-avatar'
+                            aria-hidden='true'
+                          />
+                        ) : (
+                          <span className='share-nickname-placeholder' aria-hidden='true'>
+                            {target.nickname.slice(0, 1)}
+                          </span>
+                        )}
+                        <span>{target.nickname}</span>
+                        <button
+                          type='button'
+                          onClick={() => handleRemoveNickname(target.id)}
+                          aria-label={`移除 ${target.nickname}`}
+                        >
                           ×
                         </button>
                       </li>
