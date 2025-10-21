@@ -1,29 +1,17 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState, type KeyboardEvent } from 'react'
 import type { OcWork } from '../types'
 
 interface RegistrationFormProps {
   works: OcWork[]
 }
 
-interface SubmissionLink {
-  workId: string
-  shareLink: string
-}
-
 function RegistrationForm({ works }: RegistrationFormProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [remarkMap, setRemarkMap] = useState<Record<string, { title: string; highlight: string }>>({})
-  const [submissionLinks, setSubmissionLinks] = useState<SubmissionLink[]>([])
-  const [copiedId, setCopiedId] = useState<string | null>(null)
-  const copyTimer = useRef<number | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (copyTimer.current) {
-        window.clearTimeout(copyTimer.current)
-      }
-    }
-  }, [])
+  const [successModalVisible, setSuccessModalVisible] = useState(false)
+  const [shareNicknames, setShareNicknames] = useState<string[]>([])
+  const [nicknameInput, setNicknameInput] = useState('')
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null)
 
   const handleToggle = (id: string) => {
     setSelectedIds((prev) =>
@@ -45,27 +33,50 @@ function RegistrationForm({ works }: RegistrationFormProps) {
     if (!selectedIds.length) {
       return
     }
-    const newLinks = selectedIds.map((id) => ({
-      workId: id,
-      shareLink: `https://oc.example.com/match/${id}`
-    }))
-    setSubmissionLinks(newLinks)
+    setSuccessModalVisible(true)
+    setShareFeedback(null)
   }
 
-  const handleCopy = async (link: string, workId: string) => {
-    try {
-      await navigator.clipboard.writeText(link)
-    } catch (error) {
-      console.warn('复制失败，已尝试保留文本', error)
+  const handleAddNickname = () => {
+    const trimmed = nicknameInput.trim()
+    if (!trimmed) {
+      return
     }
-    if (copyTimer.current) {
-      window.clearTimeout(copyTimer.current)
+    if (shareNicknames.includes(trimmed)) {
+      setShareFeedback(`已添加 ${trimmed}，无需重复输入`)
+      setNicknameInput('')
+      return
     }
-    setCopiedId(workId)
-    copyTimer.current = window.setTimeout(() => {
-      setCopiedId(null)
-      copyTimer.current = null
-    }, 2000)
+    setShareNicknames((prev) => [...prev, trimmed])
+    setNicknameInput('')
+    setShareFeedback(null)
+  }
+
+  const handleNicknameKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      handleAddNickname()
+    }
+  }
+
+  const handleRemoveNickname = (nickname: string) => {
+    setShareNicknames((prev) => prev.filter((item) => item !== nickname))
+  }
+
+  const handleShare = () => {
+    if (!shareNicknames.length) {
+      setShareFeedback('请至少输入一个需要通知的昵称')
+      return
+    }
+    setShareFeedback(`已通过站内消息通知 ${shareNicknames.join('、')}，祝你比赛顺利！`)
+    setShareNicknames([])
+  }
+
+  const handleCloseModal = () => {
+    setSuccessModalVisible(false)
+    setShareNicknames([])
+    setNicknameInput('')
+    setShareFeedback(null)
   }
 
   const selectedWorks = useMemo(
@@ -148,26 +159,55 @@ function RegistrationForm({ works }: RegistrationFormProps) {
           </button>
         </div>
       )}
-      {submissionLinks.length > 0 && (
-        <aside className='submission-result'>
-          <h3>报名成功，分享你的链接</h3>
-          <ul>
-            {submissionLinks.map((item) => {
-              const work = works.find((w) => w.id === item.workId)
-              const isCopied = copiedId === item.workId
-              return (
-                <li key={item.workId}>
-                  <strong>{work?.title ?? '未知作品'}</strong>
-                  <span>{item.shareLink}</span>
-                  <button type='button' onClick={() => handleCopy(item.shareLink, item.workId)}>
-                    {isCopied ? '已复制' : '复制'}
+      {successModalVisible && (
+        <div className='modal-mask'>
+          <div className='modal share-success-modal'>
+            <header>
+              <h3>报名成功</h3>
+              <button type='button' className='ghost-button' onClick={handleCloseModal}>
+                关闭
+              </button>
+            </header>
+            <div className='modal-body'>
+              <p className='modal-message'>作品已进入审核队列。填写想通知的创作者昵称，我们会通过站内消息告知他们一起围观。</p>
+              <div className='share-nickname-form'>
+                <label>
+                  邀请好友
+                  <div className='share-nickname-input'>
+                    <input
+                      type='text'
+                      value={nicknameInput}
+                      onChange={(event) => setNicknameInput(event.target.value)}
+                      onKeyDown={handleNicknameKeyDown}
+                      placeholder='输入昵称后回车，支持多个'
+                    />
+                    <button type='button' onClick={handleAddNickname}>
+                      添加
+                    </button>
+                  </div>
+                </label>
+                {shareNicknames.length > 0 && (
+                  <ul className='share-nickname-list'>
+                    {shareNicknames.map((nickname) => (
+                      <li key={nickname}>
+                        <span>{nickname}</span>
+                        <button type='button' onClick={() => handleRemoveNickname(nickname)} aria-label={`移除 ${nickname}`}>
+                          ×
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className='share-actions'>
+                  <button type='button' className='primary' onClick={handleShare}>
+                    分享通知
                   </button>
-                </li>
-              )
-            })}
-          </ul>
-          <p>复制分享卡发送给朋友，邀请他们关注你的对阵。</p>
-        </aside>
+                </div>
+                {shareFeedback && <p className='share-feedback'>{shareFeedback}</p>}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   )
