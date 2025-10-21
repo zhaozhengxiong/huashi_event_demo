@@ -32,8 +32,8 @@ function MyEntriesBoard({ entries, worksMap, isVotingStage }: MyEntriesBoardProp
     }
   }, [entries, shareEntryId, worksMap])
 
-  const handleShareClick = (entryId: string, status: MyEntry['status']) => {
-    if (!isVotingStage || status !== '进行中') {
+  const handleShareClick = (entryId: string) => {
+    if (!isVotingStage) {
       return
     }
     setShareEntryId(entryId)
@@ -72,8 +72,8 @@ function MyEntriesBoard({ entries, worksMap, isVotingStage }: MyEntriesBoardProp
                   <button
                     type='button'
                     className='ghost-button'
-                    disabled={!isVotingStage || entry.status !== '进行中'}
-                    onClick={() => handleShareClick(entry.id, entry.status)}
+                    disabled={!isVotingStage}
+                    onClick={() => handleShareClick(entry.id)}
                   >
                     分享
                   </button>
