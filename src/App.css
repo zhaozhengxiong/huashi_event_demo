@@ -358,11 +358,13 @@
   justify-self: end;
 }
 
-.share-success-modal {
+.share-success-modal,
+.share-invite-modal {
   width: min(460px, 92vw);
 }
 
-.share-success-modal .modal-body {
+.share-success-modal .modal-body,
+.share-invite-modal .modal-body {
   display: grid;
   gap: 1rem;
 }
