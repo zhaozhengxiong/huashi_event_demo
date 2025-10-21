@@ -1,30 +1,15 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { OcWork } from '../types'
+import ShareInviteForm from './ShareInviteForm'
 
 interface RegistrationFormProps {
   works: OcWork[]
 }
 
-interface SubmissionLink {
-  workId: string
-  shareLink: string
-}
-
 function RegistrationForm({ works }: RegistrationFormProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [remarkMap, setRemarkMap] = useState<Record<string, { title: string; highlight: string }>>({})
-  const [submissionLinks, setSubmissionLinks] = useState<SubmissionLink[]>([])
-  const [copiedId, setCopiedId] = useState<string | null>(null)
-  const copyTimer = useRef<number | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (copyTimer.current) {
-        window.clearTimeout(copyTimer.current)
-      }
-    }
-  }, [])
-
+  const [successModalVisible, setSuccessModalVisible] = useState(false)
   const handleToggle = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -45,27 +30,11 @@ function RegistrationForm({ works }: RegistrationFormProps) {
     if (!selectedIds.length) {
       return
     }
-    const newLinks = selectedIds.map((id) => ({
-      workId: id,
-      shareLink: `https://oc.example.com/match/${id}`
-    }))
-    setSubmissionLinks(newLinks)
+    setSuccessModalVisible(true)
   }
 
-  const handleCopy = async (link: string, workId: string) => {
-    try {
-      await navigator.clipboard.writeText(link)
-    } catch (error) {
-      console.warn('复制失败，已尝试保留文本', error)
-    }
-    if (copyTimer.current) {
-      window.clearTimeout(copyTimer.current)
-    }
-    setCopiedId(workId)
-    copyTimer.current = window.setTimeout(() => {
-      setCopiedId(null)
-      copyTimer.current = null
-    }, 2000)
+  const handleCloseModal = () => {
+    setSuccessModalVisible(false)
   }
 
   const selectedWorks = useMemo(
@@ -148,26 +117,25 @@ function RegistrationForm({ works }: RegistrationFormProps) {
           </button>
         </div>
       )}
-      {submissionLinks.length > 0 && (
-        <aside className='submission-result'>
-          <h3>报名成功，分享你的链接</h3>
-          <ul>
-            {submissionLinks.map((item) => {
-              const work = works.find((w) => w.id === item.workId)
-              const isCopied = copiedId === item.workId
-              return (
-                <li key={item.workId}>
-                  <strong>{work?.title ?? '未知作品'}</strong>
-                  <span>{item.shareLink}</span>
-                  <button type='button' onClick={() => handleCopy(item.shareLink, item.workId)}>
-                    {isCopied ? '已复制' : '复制'}
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-          <p>复制分享卡发送给朋友，邀请他们关注你的对阵。</p>
-        </aside>
+      {successModalVisible && (
+        <div className='modal-mask'>
+          <div className='modal share-success-modal'>
+            <header>
+              <h3>报名成功</h3>
+              <button type='button' className='ghost-button' onClick={handleCloseModal}>
+                关闭
+              </button>
+            </header>
+            <div className='modal-body'>
+              <p className='modal-message'>作品已进入审核队列。填写想通知的创作者昵称，我们会通过站内消息告知他们一起围观。</p>
+              <ShareInviteForm
+                successMessage={(nicknames) =>
+                  `已通过站内消息通知 ${nicknames.join('、')}，祝你比赛顺利！`
+                }
+              />
+            </div>
+          </div>
+        </div>
       )}
     </section>
   )

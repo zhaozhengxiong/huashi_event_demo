@@ -358,38 +358,155 @@
   justify-self: end;
 }
 
-.submission-result {
-  background: rgba(18, 28, 44, 0.8);
-  border-radius: 18px;
-  padding: 1.2rem 1.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.share-success-modal,
+.share-invite-modal {
+  width: min(460px, 92vw);
+}
+
+.share-success-modal .modal-body,
+.share-invite-modal .modal-body {
+  display: grid;
+  gap: 1rem;
+}
+
+.share-nickname-form {
   display: grid;
   gap: 0.9rem;
 }
 
-.submission-result ul {
+.share-nickname-input {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.share-nickname-input-field {
+  flex: 1;
+  position: relative;
+}
+
+.share-nickname-input-field input {
+  width: 100%;
+}
+
+.share-nickname-input button {
+  background: rgba(86, 130, 255, 0.28);
+  color: #e7ebff;
+  padding: 0.45rem 0.9rem;
+}
+
+.share-suggestion-panel {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  background: rgba(26, 40, 86, 0.92);
+  border: 1px solid rgba(126, 151, 255, 0.4);
+  border-radius: 12px;
+  padding: 0.35rem;
+  display: grid;
+  gap: 0.25rem;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(12, 20, 44, 0.35);
+  backdrop-filter: blur(10px);
+  z-index: 20;
+}
+
+.share-suggestion-item button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: rgba(226, 232, 255, 0.92);
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.share-suggestion-item button:hover,
+.share-suggestion-item.is-active button {
+  background: rgba(86, 130, 255, 0.22);
+}
+
+.share-suggestion-avatar {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.share-nickname-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 0.7rem;
-}
-
-.submission-result li {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  background: rgba(5, 9, 20, 0.6);
-  border-radius: 12px;
-  padding: 0.7rem 1rem;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
-.submission-result button {
-  background: rgba(255, 255, 255, 0.16);
-  color: #f5f7ff;
-  padding: 0.4rem 0.9rem;
+.share-nickname-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(86, 130, 255, 0.22);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.9rem;
 }
+
+.share-nickname-avatar,
+.share-nickname-placeholder {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: rgba(12, 26, 68, 0.7);
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+  color: rgba(236, 240, 255, 0.85);
+}
+
+.share-nickname-avatar {
+  object-fit: cover;
+  background: none;
+}
+
+.share-nickname-list span {
+  color: rgba(236, 240, 255, 0.9);
+}
+
+.share-nickname-list button {
+  background: transparent;
+  color: #f5f7ff;
+  padding: 0;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+}
+
+.share-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.share-actions .primary {
+  background: linear-gradient(120deg, #5f7dff, #8a57ff);
+  color: #fff;
+  padding: 0.5rem 1.3rem;
+}
+
+.share-feedback {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(198, 209, 255, 0.85);
+}
+
 
 .voting-arena {
   background: rgba(10, 16, 29, 0.7);

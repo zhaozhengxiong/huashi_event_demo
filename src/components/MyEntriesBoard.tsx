@@ -1,8 +1,11 @@
-﻿import type { MyEntry, OcWork } from '../types'
+import { useMemo, useState } from 'react'
+import ShareInviteForm from './ShareInviteForm'
+import type { MyEntry, OcWork } from '../types'
 
 interface MyEntriesBoardProps {
   entries: MyEntry[]
   worksMap: Record<string, OcWork>
+  isVotingStage: boolean
 }
 
 const STATUS_COLOR: Record<MyEntry['status'], string> = {
@@ -12,7 +15,34 @@ const STATUS_COLOR: Record<MyEntry['status'], string> = {
   轮空: 'status-bye'
 }
 
-function MyEntriesBoard({ entries, worksMap }: MyEntriesBoardProps) {
+function MyEntriesBoard({ entries, worksMap, isVotingStage }: MyEntriesBoardProps) {
+  const [shareEntryId, setShareEntryId] = useState<string | null>(null)
+
+  const activeShareContext = useMemo(() => {
+    if (!shareEntryId) {
+      return null
+    }
+    const entry = entries.find((item) => item.id === shareEntryId)
+    if (!entry) {
+      return null
+    }
+    return {
+      entry,
+      work: worksMap[entry.workId]
+    }
+  }, [entries, shareEntryId, worksMap])
+
+  const handleShareClick = (entryId: string, status: MyEntry['status']) => {
+    if (!isVotingStage || status !== '进行中') {
+      return
+    }
+    setShareEntryId(entryId)
+  }
+
+  const handleCloseShareModal = () => {
+    setShareEntryId(null)
+  }
+
   return (
     <section className='my-entries'>
       <header>
@@ -39,17 +69,45 @@ function MyEntriesBoard({ entries, worksMap }: MyEntriesBoardProps) {
                 <div className='entry-actions'>
                   <button type='button'>直达对阵</button>
                   <button type='button' className='ghost-button'>复制 PK 号码</button>
-                  <button type='button' className='ghost-button'>分享</button>
+                  <button
+                    type='button'
+                    className='ghost-button'
+                    disabled={!isVotingStage || entry.status !== '进行中'}
+                    onClick={() => handleShareClick(entry.id, entry.status)}
+                  >
+                    分享
+                  </button>
                 </div>
               </div>
             </article>
           )
         })}
       </div>
+      {activeShareContext && activeShareContext.work && (
+        <div className='modal-mask'>
+          <div className='modal share-invite-modal'>
+            <header>
+              <h3>邀请好友来投票</h3>
+              <button type='button' className='ghost-button' onClick={handleCloseShareModal}>
+                关闭
+              </button>
+            </header>
+            <div className='modal-body'>
+              <p className='modal-message'>
+                为《{activeShareContext.work.title}》号召援军吧！PK {activeShareContext.entry.pkNumber} 当前轮次：
+                {activeShareContext.entry.currentRound}
+              </p>
+              <ShareInviteForm
+                successMessage={(nicknames) =>
+                  `已通知 ${nicknames.join('、')} 来为《${activeShareContext.work?.title}》助阵！`
+                }
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
 
 export default MyEntriesBoard
-
-
