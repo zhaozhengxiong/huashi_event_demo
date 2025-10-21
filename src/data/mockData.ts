@@ -6,7 +6,8 @@ import type {
   MyEntry,
   OcWork,
   RegistrationConfig,
-  StageVariant
+  StageVariant,
+  UserProfile
 } from '../types'
 
 export const MOCK_STAGE: 'registration' | 'evaluation' | 'announcement' = 'evaluation'
@@ -147,6 +148,49 @@ export const OC_WORKS: OcWork[] = [
       favorites: 3544,
       comments: 276
     }
+  }
+]
+
+export const CREATOR_SUGGESTIONS: Array<Pick<UserProfile, 'id' | 'nickname' | 'avatarUrl'>> = [
+  {
+    id: 'creator-lighthouse',
+    nickname: '灯塔',
+    avatarUrl: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=160&q=80'
+  },
+  {
+    id: 'creator-nightwind',
+    nickname: '夜风船长',
+    avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=160&q=80'
+  },
+  {
+    id: 'creator-aurora',
+    nickname: '霓极光',
+    avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=160&q=80'
+  },
+  {
+    id: 'creator-sandbard',
+    nickname: '沙律吟游',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=160&q=80'
+  },
+  {
+    id: 'creator-inkguard',
+    nickname: '墨域守门',
+    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80'
+  },
+  {
+    id: 'creator-starweaver',
+    nickname: '织星人',
+    avatarUrl: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=160&q=80'
+  },
+  {
+    id: 'creator-riftchef',
+    nickname: '裂隙小厨',
+    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80'
+  },
+  {
+    id: 'creator-dawn',
+    nickname: '晨昕',
+    avatarUrl: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=160&q=80'
   }
 ]
 
