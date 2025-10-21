@@ -207,7 +207,13 @@ function App() {
           />
         );
       case "myEntries":
-        return <MyEntriesBoard entries={MY_ENTRIES} worksMap={WORKS_MAP} />;
+        return (
+          <MyEntriesBoard
+            entries={MY_ENTRIES}
+            worksMap={WORKS_MAP}
+            isVotingStage={stage === "evaluation"}
+          />
+        );
       case "pkList":
         return (
           <PkListTable
